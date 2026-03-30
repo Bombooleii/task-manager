@@ -57,7 +57,7 @@ class Task {
       dueDate: map['dueDate'] != null ? DateTime.parse(map['dueDate'] as String) : null,
       isCompleted: map['isCompleted'] == 1,
       syncStatus: map['syncStatus'] as String? ?? 'synced',
-      serverId: map['serverId'] as String?,
+      serverId: map['serverId']?.toString(),
     );
   }
 

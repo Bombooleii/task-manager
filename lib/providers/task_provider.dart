@@ -31,6 +31,13 @@ class TaskProvider extends ChangeNotifier {
     _init();
   }
 
+  void setToken(String? token) {
+    _apiService.setToken(token);
+    if (token != null) {
+      syncWithServer();
+    }
+  }
+
   Future<void> _init() async {
     _isOnline = await _connectivityService.isOnline;
     await loadTasks();
@@ -46,10 +53,6 @@ class TaskProvider extends ChangeNotifier {
         }
       },
     );
-
-    if (_isOnline) {
-      await syncWithServer();
-    }
   }
 
   Future<void> loadTasks() async {
@@ -106,10 +109,8 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> deleteTask(Task task) async {
     if (task.syncStatus == 'pending_create') {
-      // Never synced to server, just delete locally
       await _databaseService.deleteTask(task.id);
     } else {
-      // Mark for deletion, sync will handle server-side delete
       final deletedTask = task.copyWith(syncStatus: 'pending_delete');
       await _databaseService.updateTask(deletedTask);
 
@@ -133,9 +134,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // First push local changes
       await _syncService.syncPendingChanges();
-      // Then pull server changes
       await _syncService.fetchAndMergeFromServer();
       await loadTasks();
     } catch (_) {
@@ -170,6 +169,13 @@ class TaskProvider extends ChangeNotifier {
     } catch (_) {
       // Will sync later when online
     }
+  }
+
+  Future<void> clearLocalData() async {
+    final db = await _databaseService.database;
+    await db.delete('tasks');
+    _tasks = [];
+    notifyListeners();
   }
 
   @override

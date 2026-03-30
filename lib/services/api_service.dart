@@ -2,19 +2,25 @@ import 'package:dio/dio.dart';
 import '../models/task_model.dart';
 
 class ApiService {
-  // TODO: Replace with your deployed Render URL
-  // Example: 'https://task-manager-server-xxxx.onrender.com'
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://task-manager-api-515h.onrender.com';
 
   final Dio _dio;
 
   ApiService()
       : _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
           headers: {'Content-Type': 'application/json'},
         ));
+
+  void setToken(String? token) {
+    if (token != null) {
+      _dio.options.headers['Authorization'] = 'Bearer $token';
+    } else {
+      _dio.options.headers.remove('Authorization');
+    }
+  }
 
   Future<List<Task>> fetchTasks() async {
     final response = await _dio.get('/tasks');

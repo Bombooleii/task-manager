@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/task_provider.dart';
 import '../widgets/connectivity_banner.dart';
 import '../widgets/task_tile.dart';
+import 'auth_screen.dart';
 import 'task_form_screen.dart';
 
 class TaskListScreen extends StatelessWidget {
@@ -28,6 +30,57 @@ class TaskListScreen extends StatelessWidget {
                 icon: const Icon(Icons.sync),
                 onPressed: provider.isOnline ? () => provider.syncWithServer() : null,
                 tooltip: 'Синк хийх',
+              );
+            },
+          ),
+          Consumer<AuthProvider>(
+            builder: (context, auth, _) {
+              return PopupMenuButton<String>(
+                icon: const Icon(Icons.account_circle_outlined),
+                onSelected: (value) async {
+                  if (value == 'logout') {
+                    await context.read<TaskProvider>().clearLocalData();
+                    await auth.logout();
+                    if (context.mounted) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AuthScreen()),
+                      );
+                    }
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    enabled: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          auth.userName ?? '',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          auth.userEmail ?? '',
+                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, size: 20, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Гарах', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -75,11 +128,7 @@ class TaskListScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8, bottom: 80),
                     children: [
                       if (pending.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          'Хийх ажлууд',
-                          pending.length,
-                          Colors.blue,
-                        ),
+                        _buildSectionHeader('Хийх ажлууд', pending.length, Colors.blue),
                         ...pending.map((task) => TaskTile(
                               task: task,
                               onToggle: () => provider.toggleTaskCompletion(task),
@@ -88,11 +137,7 @@ class TaskListScreen extends StatelessWidget {
                             )),
                       ],
                       if (completed.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          'Дууссан',
-                          completed.length,
-                          Colors.green,
-                        ),
+                        _buildSectionHeader('Дууссан', completed.length, Colors.green),
                         ...completed.map((task) => TaskTile(
                               task: task,
                               onToggle: () => provider.toggleTaskCompletion(task),
