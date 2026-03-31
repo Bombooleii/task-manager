@@ -32,21 +32,13 @@ class AuthProvider extends ChangeNotifier {
 
   Future<String?> getToken() => _authService.getToken();
 
-  Future<bool> register({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> register({required String name, required String email, required String password}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final data = await _authService.register(
-        name: name,
-        email: email,
-        password: password,
-      );
+      final data = await _authService.register(name: name, email: email, password: password);
       _isLoggedIn = true;
       _userName = data['user']['name'];
       _userEmail = data['user']['email'];
@@ -66,10 +58,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();

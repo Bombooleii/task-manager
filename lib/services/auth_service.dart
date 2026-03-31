@@ -3,39 +3,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'api_service.dart';
 
 class AuthService {
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: ApiService.baseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-    headers: {'Content-Type': 'application/json'},
-  ));
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: ApiService.baseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {'Content-Type': 'application/json'},
+    ),
+  );
 
   static const String _tokenKey = 'auth_token';
   static const String _userNameKey = 'user_name';
   static const String _userEmailKey = 'user_email';
 
-  Future<Map<String, dynamic>> register({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    final response = await _dio.post('/register', data: {
-      'name': name,
-      'email': email,
-      'password': password,
-    });
+  Future<Map<String, dynamic>> register({required String name, required String email, required String password}) async {
+    final response = await _dio.post('/register', data: {'name': name, 'email': email, 'password': password});
     await _saveSession(response.data);
     return response.data;
   }
 
-  Future<Map<String, dynamic>> login({
-    required String email,
-    required String password,
-  }) async {
-    final response = await _dio.post('/login', data: {
-      'email': email,
-      'password': password,
-    });
+  Future<Map<String, dynamic>> login({required String email, required String password}) async {
+    final response = await _dio.post('/login', data: {'email': email, 'password': password});
     await _saveSession(response.data);
     return response.data;
   }

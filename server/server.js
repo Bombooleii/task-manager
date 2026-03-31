@@ -113,6 +113,13 @@ app.post('/login', async (req, res) => {
   });
 });
 
+// --- Users route ---
+app.get('/users', (req, res) => {
+  const db = readDb();
+  const users = db.users.map(({ password, ...user }) => user);
+  res.json(users);
+});
+
 // --- Task routes (protected) ---
 app.get('/tasks', authenticate, (req, res) => {
   const db = readDb();

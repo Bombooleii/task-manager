@@ -10,8 +10,6 @@ class ConnectivityService {
   }
 
   Stream<bool> get onConnectivityChanged {
-    return _connectivity.onConnectivityChanged.map(
-      (results) => !results.contains(ConnectivityResult.none),
-    );
+    return _connectivity.onConnectivityChanged.map((results) => !results.contains(ConnectivityResult.none));
   }
 }

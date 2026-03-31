@@ -18,18 +18,14 @@ class SyncService {
         switch (task.syncStatus) {
           case 'pending_create':
             final serverTask = await _apiService.createTask(task);
-            await _databaseService.updateTask(
-              serverTask.copyWith(syncStatus: 'synced'),
-            );
+            await _databaseService.updateTask(serverTask.copyWith(syncStatus: 'synced'));
             synced++;
             break;
 
           case 'pending_update':
             if (task.serverId != null) {
               final serverTask = await _apiService.updateTask(task);
-              await _databaseService.updateTask(
-                serverTask.copyWith(syncStatus: 'synced'),
-              );
+              await _databaseService.updateTask(serverTask.copyWith(syncStatus: 'synced'));
               synced++;
             }
             break;
