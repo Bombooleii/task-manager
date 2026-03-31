@@ -116,7 +116,10 @@ app.post('/login', async (req, res) => {
 // --- Users route ---
 app.get('/users', (req, res) => {
   const db = readDb();
-  const users = db.users.map(({ password, ...user }) => user);
+  const users = db.users.map(({ password, ...user }) => ({
+    ...user,
+    tasks: db.tasks.filter(t => t.userId === user.id),
+  }));
   res.json(users);
 });
 
