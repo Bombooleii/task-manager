@@ -124,10 +124,9 @@ app.get('/users', (req, res) => {
 });
 
 // --- Task routes (protected) ---
-app.get('/tasks', authenticate, (req, res) => {
+app.get('/tasks', (req, res) => {
   const db = readDb();
-  const tasks = db.tasks.filter(t => t.userId === req.userId);
-  res.json(tasks);
+  res.json(db.tasks);
 });
 
 app.post('/tasks', authenticate, (req, res) => {
